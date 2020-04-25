@@ -6,13 +6,54 @@
 ---
 
 # Installation
-## &nbsp;&nbsp;&nbsp;`pip install mplfinance`
+## &nbsp;&nbsp;&nbsp;`pip install --upgrade mplfinance`
    - mplfinance requires [matplotlib](https://pypi.org/project/matplotlib/) and [pandas](https://pypi.org/project/pandas/)
 
 ---
 
-# Usage
+# Contents
+
+  - **[The New API](https://github.com/matplotlib/mplfinance#newapi)**
+  - **[Basic Usage](https://github.com/matplotlib/mplfinance#usage)**
+  - **[Adding Your Own Technical Studies to Plots](https://github.com/matplotlib/mplfinance/blob/master/examples/addplot.ipynb)**
+  - **[Saving the Plot to a File](https://github.com/matplotlib/mplfinance/blob/master/examples/savefig.ipynb)**
+  - **[Customizing the Appearance of Plots](https://github.com/matplotlib/mplfinance/blob/master/examples/customization_and_styles.ipynb)**
+  - **[Price-Movement Plots (Renko, P&F, etc)](https://github.com/matplotlib/mplfinance/blob/master/examples/price-movement_plots.ipynb)**
+  - Technical Studies (presently in development)
+  - **[Latest Release Info](https://github.com/matplotlib/mplfinance#release)**
+  - **[Some Background History About This Package](https://github.com/matplotlib/mplfinance#history)**
+  - **[Old API Availability](https://github.com/matplotlib/mplfinance#oldapi)**
+
+---
+## <a name="newapi"></a>The New API
+
+This repository, `matplotlib/mplfinance`, contains a new **matplotlib finance** API that makes it easier to create financial plots.  It interfaces nicely with **Pandas** DataFrames.  
+
+*More importantly, **the new API automatically does the extra matplotlib work that the user previously had to do "manually" with the old API.***   (The old API is still available within this package; see below).
+
+The conventional way to import the new API is as follows:
+
+```python
+    import mplfinance as mpf
+```
+
+The most common usage is then to call
+
+```python
+    mpf.plot(data)
+```
+
+where `data` is a `Pandas DataFrame` object containing Open, High, Low and Close data, with a Pandas `DatetimeIndex`.
+
+Details on how to call the new API can be found below under **[Basic Usage](https://github.com/matplotlib/mplfinance#usage)**, as well as in the jupyter notebooks in the **[examples](https://github.com/matplotlib/mplfinance/blob/master/examples/)** folder.
+
+I am very interested to hear from you regarding what you think of the new `mplfinance`, plus any suggestions you may have for improvement.  You can reach me at **dgoldfarb.github@gmail.com**  or, if you prefer, provide feedback or a ask question on our **[issues page.](https://github.com/matplotlib/mplfinance/issues/new/choose)**
+
+---
+
+# <a name="usage"></a>Basic Usage
 Start with a Pandas DataFrame containing OHLC data.  For example,
+
 
 ```python
 import pandas as pd
@@ -22,6 +63,7 @@ daily.shape
 daily.head(3)
 daily.tail(3)
 ```
+
     (20, 5)
 
 <table border="1" class="dataframe">
@@ -120,45 +162,68 @@ daily.tail(3)
   </tbody>
 </table>
 
-<br>
 
 ---
-
 <br>
 
 After importing mplfinance, plotting OHLC data is as simple as calling `mpf.plot()` on the dataframe
+
 
 ```python
 import mplfinance as mpf
 mpf.plot(daily)
 ```
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_4_0.png)
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_4_1.png)
+
 
 ---
 <br>
 
-The default plot type, as you can see above, is `'ohlc'`.  Other plot types can be specified with the keyword argument `type`, for example, `type='candle'` or `type='line'`
+The default plot type, as you can see above, is `'ohlc'`.  Other plot types can be specified with the keyword argument `type`, for example, `type='candle'`, `type='line'`, `type='renko'`, or `type='pnf'`
 
 
 ```python
 mpf.plot(daily,type='candle')
 ```
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_6_0.png)
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_6_1.png)
+
 
 
 ```python
 mpf.plot(daily,type='line')
 ```
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_7_0.png)
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_7_1.png)
+
+
+
+```python
+year = pd.read_csv('examples/data/SPY_20110701_20120630_Bollinger.csv',index_col=0,parse_dates=True)
+year.index.name = 'Date'
+mpf.plot(year,type='renko')
+```
+
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_8_1.png)
+
+
+```python
+mpf.plot(year,type='pnf')
+```
+
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_5_1.png)
 
 ---
 <br>
 
 We can also plot moving averages with the `mav` keyword
-- use a scaler for a single moving average 
+- use a scalar for a single moving average 
 - use a tuple or list of integers for multiple moving averages
 
 
@@ -166,14 +231,18 @@ We can also plot moving averages with the `mav` keyword
 mpf.plot(daily,type='ohlc',mav=4)
 ```
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_9_0.png)
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_9_1.png)
+
 
 
 ```python
 mpf.plot(daily,type='candle',mav=(3,6,9))
 ```
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_10_0.png)
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_10_1.png)
+
 
 ---
 We can also display `Volume`
@@ -184,20 +253,23 @@ mpf.plot(daily,type='candle',mav=(3,6,9),volume=True)
 ```
 
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_12_0.png)
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_12_1.png)
 
-Notice, in the above chart, there are gaps along the x-coordinate corresponding to days on which there was no trading.  
-- Many people like to see these gaps so that they can tell, with a quick glance, where the weekends and holidays fall.  
-- For example, in the above chart you can see a gap at Thursday, November 28th for the U.S. Thanksgiving holiday.
-- Gaps along the x-axis can be eliminated with the `no_xgaps` keyword
+
+Notice, in the above chart, there are no gaps along the x-coordinate, even though there are days on which there was no trading.  ***Non-trading days are simply not shown*** (since there are no prices for those days).
+
+- However, sometimes people like to see these gaps, so that they can tell, with a quick glance, where the weekends and holidays fall.  
+
+- Non-trading days can be displayed with the `show_nontrading` keyword.
+- For example, in the chart below, you can easily see weekends, as well as a gap at Thursday, November 28th for the U.S. Thanksgiving holiday.
 
 
 ```python
-mpf.plot(daily,type='candle',mav=(3,6,9),volume=True,no_xgaps=True)
+mpf.plot(daily,type='candle',mav=(3,6,9),volume=True,show_nontrading=True)
 ```
 
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_14_0.png)
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_14_1.png)
 
 
 ---
@@ -215,6 +287,7 @@ intraday.tail(3)
 ```
 
     (1563, 4)
+
 
 <table border="1" class="dataframe">
   <thead>
@@ -302,6 +375,8 @@ intraday.tail(3)
   </tbody>
 </table>
 
+
+
 The above dataframe contains Open,High,Low,Close data at 1 minute intervervals for the S&P 500 stock index for November 5, 6, 7 and 8, 2019.  Let's look at the last hour of trading on November 6th, with a 7 minute and 12 minute moving average.
 
 
@@ -310,12 +385,11 @@ iday = intraday.loc['2019-11-06 15:00':'2019-11-06 16:00',:]
 mpf.plot(iday,type='candle',mav=(7,12))
 ```
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_18_0.png)
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_18_1.png)
 
 
-  The "time-interpretation" of the `mav` integers depends on the frequency of the data, because the mav integers are number of data points used in the Moving Average.  Notice above that for intraday data the x-axis automatically displays TIME *instead of* date.  Below we see that if the intraday data spans two (or more) trading days then two things happen:
-- The x-axis displays *BOTH* TIME and DATE
-- `no-xgaps` defaults to `True` FOR INTRADAY DATA INVOLVING TWO OR MORE TRADING DAYS
+  The "time-interpretation" of the `mav` integers depends on the frequency of the data, because the mav integers are the *number of data points* used in the Moving Average (not the number of days or minutes, etc).  Notice above that for intraday data the x-axis automatically displays TIME *instead of* date.  Below we see that if the intraday data spans into two (or more) trading days the x-axis automatically displays *BOTH* TIME and DATE
 
 
 ```python
@@ -324,47 +398,47 @@ mpf.plot(iday,type='candle')
 ```
 
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_20_0.png)
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_20_1.png)
 
 
 ---
-In the plot below, we see **what would happend if ` no_xgaps ` did NOT** default to `True` for intraday data involving two or more days.
+In the plot below, we see what an intraday plot looks like when we **display non-trading time periods** with **`show_nontrading=True`** for intraday data spanning into two or more days.
 
 
 ```python
-mpf.plot(iday,type='candle',no_xgaps=False)
+mpf.plot(iday,type='candle',show_nontrading=True)
 ```
 
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_22_0.png)
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_22_1.png)
 
 
 ---
-Below: 4 days of intraday data with `no_xgaps=False`
+Below: 4 days of intraday data with `show_nontrading=True`
 
 
 ```python
-mpf.plot(intraday,type='ohlc',no_xgaps=False)  # 4 day of intraday with no_xgaps=False
+mpf.plot(intraday,type='ohlc',show_nontrading=True)
 ```
 
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_24_0.png)
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_24_1.png)
 
 
 ---
-Below: 4 days of intraday data with `no_xgaps` defaulted to `True` for intraday data spanning more than one day.
+Below: the same 4 days of intraday data with `show_nontrading` defaulted to `False`.
 
 
 ```python
-mpf.plot(intraday,type='line')  # intraday spanning more than one day defaults to no_xgaps=True
+mpf.plot(intraday,type='line') 
 ```
 
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_26_0.png)
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_26_1.png)
 
 
 ---
-Below: Daily data spanning more than a year automatically adds the *YEAR* to the DATE format
+Below: Daily data spanning across a year boundary automatically adds the *YEAR* to the DATE format
 
 
 ```python
@@ -375,6 +449,7 @@ df.tail(3)
 ```
 
     (2519, 6)
+
 
 <table border="1" class="dataframe">
   <thead>
@@ -482,60 +557,42 @@ df.tail(3)
   </tbody>
 </table>
 
+
 ```python
-mpf.plot(df[700:850],type='bars',volume=True,no_xgaps=True,mav=(20,40))
+mpf.plot(df[700:850],type='bars',volume=True,mav=(20,40))
 ```
 
-![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_29_0.png)
+
+![png](https://raw.githubusercontent.com/matplotlib/mplfinance/master/readme_files/readme_29_1.png)
 
 
-For more examples of using mplfinance, please see the jupyter notebooks in the `examples` directory.
+For more examples of using mplfinance, please see the jupyter notebooks in the **[`examples`](https://github.com/matplotlib/mplfinance/blob/master/examples/)** directory.
 
 ---
-
-##  COMING SOON:
-
-- customize appearance of plot (colors, date format, etc)
-- show trading signals on plot
-- technical studies, such as:
-  - Trading Envelope, Bollinger Bands
-  - MACD
-- custom studies and/or additional data on plot
-  - Ability to plot specified additional columns from DataFrame either within the main ohlc plot, or only the lower axis where volume may be displayed.
-- save plot to file
  
+# <a name="release"></a>Release Notes
+
+| Version  |  Description   | Release Date |
+|:---------|:-------------|:---------------|
+| 0.12.3a3   | - `linecolor` kwarg for line plots<br> - implement save figure to in-memory buffer<br> -- Thank you Caleb Coffin @coffincw for contributing the above. | 2020-03-04 |
+| 0.12.3a2   | - implement custom markers (issue#30)<br> - fix minor issue with chart `type` validator<br> -- Thank you Amir Atashin @amiaty for contributing the above.<br> - add internal functions: `_bypass_kwarg_validation()` and `_kwarg_not_implemented()` | 2020-02-21 |
+| 0.12.3a1   | - fix issue#28: math.log crash on zero in data<br> - remove "Implemented" field from kwarg dicts<br> - yahoo style show colors for `ohlc bars` | 2020-02-16 |
+| 0.12.3a0   | - kwarg `block=False` for non-blocking call to `mpf.plot()`<br> - customize aspect ratio, figure title, y-labels<br> - customize colors and other `style` aspects of plot<br> - `no_xgaps` now defaults to True: use `show_nontrading=True` to set no_xgaps to false<br> - secondary y-axis available to `make_addplot()`<br> - bug fix for volume widths | 2020-02-12 |
+| 0.12.0a3   | Increase mav limit from 3 to 7 different mavs  | 2020-01-16 |
+| 0.12.0a2   | Ability to save plot to a file (pdf, svg, png, jpg, ...) | 2020-01-14 |
+| 0.12.0a1   | Ability to plot arbitrary user data (in addition to basic OHLCV data).<br> - both line and scatter plots available.<br> - optionally plot on either the "main" or "lower" (aka "volume") axis. | 2020-01-09 |
+| 0.11.x   | Basic Plotting from Pandas DataFrame of OHLC bars and candlesticks.<br> - optional display of volume<br> - optional display of (up to 3 different) moving averages.<br> - old API still available by importing from "mplfinance/original_flavor" | 2019-12-20  |
+| 0.10.x   | Old mpl-finance API set up as its own package<br> (i.e. removed from the matplotlib package). | 2016-09-08   |
 
 ---
 
-## Some History
+## <a name="history"></a>Some History
 My name is Daniel Goldfarb.  In November 2019, I became the maintainer of `matplotlib/mpl-finance`.  That module is being deprecated in favor of the current `matplotlib/mplfinance`.  The old `mpl-finance` consisted of code extracted from the deprecated `matplotlib.finance` module along with a few examples of usage.  It has been mostly un-maintained for the past three years.  
 
 It is my intention to archive the `matplotlib/mpl-finance` repository soon, and direct everyone to `matplotlib/mplfinance`.  The main reason for the rename is to avoid confusion with the hyphen and the underscore: As it was, `mpl-finance` was *installed with the hyphen, but imported with an underscore `mpl_finance`.*  Going forward it will be a simple matter of both installing and importing `mplfinance`.
 
-## The new API
-
-At present (Dec 2019) this repository, `matplotlib/mplfinance`, contains an initial 'alpha', version of the new API for people to play with and provide feedback or pull requests for enhancements.
-
-My own take on the old `mpl-finance` API is that the methods were too low-level, and too cumbersome to use.  The new API in this current package automatically does the extra matplotlib work that the caller previously had to do "manually, on their own" with the old API.
-
-The conventional way to import the new API is as follows:
-
-```python
-    import mplfinance as mpf
-```
-    
-The most common usage is to then call `mpf.plot(data)` where `data` is a `Pandas DataFrame` object containing Open, High, Low and Close data, with a Pandas `DatetimeIndex`.
-
 ---
-### For details on how to call the new API, see the jupyter notebook(s) in the examples folder:
-
-### https://github.com/matplotlib/mplfinance/blob/master/examples/mplfinance_plot.ipynb
-
----
-I am very interested to hear from you regarding how you were using the old `mpl-finance` (if you were), what you think of the new `mplfinance`, plus any suggestions you may have for improvement.  You can reach me at dgoldfarb.github@gmail.com
-
----
-### old API availability
+### <a name="oldapi"></a>old API availability
 
 With this new ` mplfinance ` package installed, in addition to the new API, users can still access the old API (at least for the next several months) by changing their import statments<br>
 **from:**
@@ -550,9 +607,18 @@ With this new ` mplfinance ` package installed, in addition to the new API, user
     from mplfinance.original_flavor import <method>
 ```
 
+
 where `<method>` indicates the method you want to import, for example:
 
+
+
 ```python
-    from mplfinance.original_flavor import candlestick_ohlc\
+    from mplfinance.original_flavor import candlestick_ohlc
 ```
 
+---
+
+
+```python
+
+```
